@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const {z} = require("zod");
 
-mongoose.connect("")
+mongoose.connect("");
 
 const app = express();
 app.use(express.json());
@@ -19,14 +19,25 @@ app.post("/signup", async function(req, res) {
         password: z.string().min(6).max(100),
         name: z.string().min(2)
     });
-    const parsedData = requiredbody.parse(req.body);
-    const parseData = requiredbody.safeParse(req.body);
+
+    // const parsedData = requiredbody.parse(req.body);
+    const parseDataWithSuccess = requiredbody.safeParse(req.body);
+
+    if(!parseDataWithSuccess.success) {
+        res.status(400).json({
+            message: "Invalid data",
+            error: parseDataWithSuccess.error
+        });
+        return;
+    }
 
     
     const email = req.body.email;
     const password = req.body.password;
     const name = req.body.name;
 
+    console.log(email, password, name);
+    
     const hashedPassword = await bcrypt.hash(password, 5);
     console.log(hashedPassword);
     
